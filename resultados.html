@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Resultados | Equipo 6</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script src="js/datos.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="cabecera">
+      <h1>Simulador de Phishing</h1>
+      <button id="menuBoton" class="menu-boton" type="button" aria-expanded="false">Menú</button>
+    </div>
+    <nav id="menu" aria-label="Navegación principal">
+      <a href="index.html">Simulador</a>
+      <a href="crear.html">Crear casos</a>
+      <a href="resultados.html" aria-current="page">Resultados</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Resumen general y Ranking</h2>
+      <div class="tarjetas-resumen">
+        <div class="caja-dato">
+          <span>Intentos realizados:</span>
+          <strong id="cantidad">0</strong>
+        </div>
+        <div class="caja-dato">
+          <span>Promedio general de aciertos:</span>
+          <strong id="promedio">0 %</strong>
+        </div>
+      </div>
+
+      <h3>Top 5 mejores puntajes</h3>
+      <ol id="ranking" class="lista-ranking"></ol>
+      <p id="sinRanking" class="aviso" hidden>Aún no hay intentos registrados. Completa el simulador para aparecer en el ranking.</p>
+    </section>
+
+    <section>
+      <h2>Historial de intentos</h2>
+      <div class="filtros filtros-dos">
+        <div>
+          <label for="buscarAlias">Filtrar por alias del participante</label>
+          <input id="buscarAlias" type="search" placeholder="Buscar alias...">
+        </div>
+        <div>
+          <label for="ordenIntentos">Ordenar por porcentaje</label>
+          <select id="ordenIntentos">
+            <option value="mayor">Mayor porcentaje primero</option>
+            <option value="menor">Menor porcentaje primero</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="sinIntentos" class="aviso" hidden>No hay intentos que coincidan con la búsqueda.</p>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Alias</th>
+              <th>Fecha</th>
+              <th>Aciertos</th>
+              <th>Total</th>
+              <th>Porcentaje</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaIntentos"></tbody>
+        </table>
+      </div>
+
+      <div class="botones">
+        <button id="exportarIntentos" type="button" class="secundario">Exportar historial en JSON</button>
+      </div>
+      <p id="mensajeResultados" class="texto-exito"></p>
+    </section>
+  </main>
+
+  <footer>Equipo 6 · Proyecto educativo de Ciberseguridad · Todos los casos son simulados</footer>
+</body>
+</html>
