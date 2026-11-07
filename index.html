@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Simulador | Equipo 6</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script src="js/datos.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="cabecera">
+      <h1>Simulador de Phishing</h1>
+      <button id="menuBoton" class="menu-boton" type="button" aria-expanded="false">Menú</button>
+    </div>
+    <nav id="menu" aria-label="Navegación principal">
+      <a href="index.html" aria-current="page">Simulador</a>
+      <a href="crear.html">Crear casos</a>
+      <a href="resultados.html">Resultados</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Entrenamiento de detección</h2>
+      <p>Analiza cada correo detenidamente (remitente, asunto y enlaces) y decide si es legítimo o phishing. No ingreses datos personales reales.</p>
+      <form id="inicioForm" novalidate>
+        <label for="alias">Alias del participante</label>
+        <input id="alias" type="text" maxlength="30" autocomplete="off" aria-describedby="aliasError" placeholder="Ejemplo: estudiante_unas">
+        <small class="error" id="aliasError"></small>
+        <button type="submit">Comenzar intento</button>
+      </form>
+    </section>
+
+    <section id="pregunta" hidden>
+      <h2 id="progreso">Caso</h2>
+      <article class="correo">
+        <p><strong>De:</strong> <span id="verRemitente" class="remitente-destacado"></span></p>
+        <p><strong>Asunto:</strong> <span id="verAsunto"></span></p>
+        <hr class="separador-correo">
+        <p id="verCuerpo" class="cuerpo"></p>
+      </article>
+
+      <div class="botones">
+        <button id="legitimo" type="button">Es Legítimo</button>
+        <button id="phishing" type="button" class="boton-alerta">Es Phishing</button>
+      </div>
+
+      <p id="respuesta" class="aviso" hidden></p>
+
+      <div id="pistas" class="caja-pistas" hidden>
+        <h3>Pistas que debiste notar:</h3>
+        <ul id="listaPistas"></ul>
+      </div>
+
+      <button id="siguiente" type="button" hidden>Siguiente caso</button>
+    </section>
+
+    <section id="final" hidden>
+      <h2>Resultado del entrenamiento</h2>
+      <p id="puntaje" class="aviso"></p>
+      <h3>Casos en los que fallaste:</h3>
+      <ul id="erroresFinales"></ul>
+      <div class="botones">
+        <button id="reiniciar" type="button">Nuevo intento</button>
+        <a href="resultados.html" class="enlace-boton">Ver ranking e historial</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>Equipo 6 · Proyecto educativo de Ciberseguridad · Todos los casos son simulados</footer>
+</body>
+</html>
