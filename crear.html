@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Crear casos | Equipo 6</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script src="js/datos.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="cabecera">
+      <h1>Simulador de Phishing</h1>
+      <button id="menuBoton" class="menu-boton" type="button" aria-expanded="false">Menú</button>
+    </div>
+    <nav id="menu" aria-label="Navegación principal">
+      <a href="index.html">Simulador</a>
+      <a href="crear.html" aria-current="page">Crear casos</a>
+      <a href="resultados.html">Resultados</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2 id="tituloForm">Crear un caso simulado</h2>
+      <p>Registra correos de prueba (puedes usar trampas visuales como <code>soporte@0ffice365.com</code>). Las URLs escritas en el mensaje se mostrarán subrayadas pero desactivadas por seguridad.</p>
+      
+      <form id="casoForm" novalidate>
+        <label for="remitente">Correo del remitente</label>
+        <input id="remitente" type="email" maxlength="100" placeholder="Ejemplo: seguridad@0ffice365-support.com" aria-describedby="remitenteError">
+        <small class="error" id="remitenteError"></small>
+
+        <label for="asunto">Asunto del correo</label>
+        <input id="asunto" type="text" maxlength="100" placeholder="Ejemplo: Urgente: Verifique su cuenta institucional" aria-describedby="asuntoError">
+        <small class="error" id="asuntoError"></small>
+
+        <label for="cuerpo">Cuerpo del mensaje</label>
+        <textarea id="cuerpo" rows="4" maxlength="500" placeholder="Escribe el contenido del correo. Si incluyes un enlace (https://...), se verá azul pero sin redirección." aria-describedby="cuerpoError"></textarea>
+        <small class="error" id="cuerpoError"></small>
+
+        <label for="tipo">Clasificación correcta</label>
+        <select id="tipo" aria-describedby="tipoError">
+          <option value="">Selecciona una opción</option>
+          <option value="phishing">Phishing (Fraudulento)</option>
+          <option value="legitimo">Legítimo (Seguro)</option>
+        </select>
+        <small class="error" id="tipoError"></small>
+
+        <label for="pistasCampo">Pistas de detección (de 1 a 3 pistas, escribe una por línea)</label>
+        <textarea id="pistasCampo" rows="3" maxlength="365" aria-describedby="pistasCampoError" placeholder="Ejemplo: El dominio reemplaza la letra 'o' por un cero (0ffice365)."></textarea>
+        <small class="error" id="pistasCampoError"></small>
+
+        <div class="botones">
+          <button id="guardar" type="submit">Guardar caso</button>
+          <button id="cancelar" type="button" class="secundario" hidden>Cancelar edición</button>
+        </div>
+        <p id="mensajeForm" class="texto-exito"></p>
+      </form>
+    </section>
+
+    <section>
+      <h2>Resumen de casos: <span id="totalCasos">0</span></h2>
+      <p>Base de datos local con 6 casos precargados y 4 casos diseñados por el equipo.</p>
+
+      <div class="filtros">
+        <div>
+          <label for="buscarCaso">Buscar por asunto</label>
+          <input id="buscarCaso" type="search" placeholder="Escribe para buscar...">
+        </div>
+        <div>
+          <label for="filtrarTipo">Filtrar por tipo</label>
+          <select id="filtrarTipo">
+            <option value="todos">Todos</option>
+            <option value="phishing">Phishing</option>
+            <option value="legitimo">Legítimo</option>
+          </select>
+        </div>
+        <div>
+          <label for="filtrarOrigen">Filtrar por origen</label>
+          <select id="filtrarOrigen">
+            <option value="todos">Todos</option>
+            <option value="base">Precargados (Base)</option>
+            <option value="equipo">Creados (Equipo)</option>
+          </select>
+        </div>
+        <div>
+          <label for="ordenCaso">Ordenar lista</label>
+          <select id="ordenCaso">
+            <option value="az">Asunto (A - Z)</option>
+            <option value="za">Asunto (Z - A)</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="sinCasos" class="aviso" hidden>No se encontraron casos con esos filtros.</p>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Remitente</th>
+              <th>Asunto</th>
+              <th>Tipo</th>
+              <th>Origen</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaCasos"></tbody>
+        </table>
+      </div>
+
+      <div class="botones">
+        <button id="ejemplos" type="button" class="secundario">Cargar los 10 casos de ejemplo</button>
+        <button id="exportarCasos" type="button" class="secundario">Exportar datos en JSON</button>
+      </div>
+      <p id="mensajeLista" class="texto-exito"></p>
+    </section>
+  </main>
+
+  <footer>Equipo 6 · Proyecto educativo de Ciberseguridad · Todos los casos son simulados</footer>
+</body>
+</html>
