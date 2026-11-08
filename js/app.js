@@ -1,3 +1,11 @@
+/* Cinco heurísticas de usabilidad de Nielsen aplicadas en el proyecto:
+1. Visibilidad del estado: indica número de caso actual, conteos y mensajes de confirmación.
+2. Relación con el mundo real: formato de bandeja de correo y botones claros ("Es Legítimo" / "Es Phishing").
+3. Control y libertad del usuario: opción para cancelar edición y confirmación antes de eliminar.
+4. Prevención de errores: validación en cada campo antes de guardar datos.
+5. Reconocimiento antes que recuerdo: muestra las pistas de detección tras cada respuesta.
+*/
+
 function elemento(id) {
   return document.getElementById(id);
 }
@@ -6,6 +14,27 @@ function crearEtiqueta(nombreEtiqueta, texto) {
   let nodo = document.createElement(nombreEtiqueta);
   nodo.textContent = texto;
   return nodo;
+}
+
+function mostrarCuerpoCorreo(contenedor, textoMensaje) {
+  contenedor.innerHTML = "";
+  let palabras = textoMensaje.split(" ");
+
+  for (let i = 0; i < palabras.length; i++) {
+    let palabra = palabras[i];
+    if (palabra.startsWith("http://") || palabra.startsWith("https://")) {
+      let enlaceVisual = crearEtiqueta("span", palabra);
+      enlaceVisual.className = "enlace-falso";
+      enlaceVisual.title = "Enlace desactivado por seguridad";
+      contenedor.appendChild(enlaceVisual);
+    } else {
+      contenedor.appendChild(document.createTextNode(palabra));
+    }
+
+    if (i < palabras.length - 1) {
+      contenedor.appendChild(document.createTextNode(" "));
+    }
+  }
 }
 
 function porcentaje(aciertos, total) {
@@ -35,12 +64,165 @@ if (elemento("menuBoton")) {
   });
 }
 
+if (elemento("inicioForm")) {
+  let aliasActual = "";
+  let preguntas = [];
+  let posicion = 0;
+  let aciertos = 0;
+  let fallados = [];
+
+  elemento("inicioForm").addEventListener("submit", function (evento) {
+    evento.preventDefault();
+    aliasActual = elemento("alias").value.trim();
+
+    let patronAlias = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ _.-]{2,30}$/;
+    if (!patronAlias.test(aliasActual)) {
+      elemento("aliasError").textContent = "Escribe un alias válido de 2 a 30 caracteres (sin símbolos < o >).";
+      elemento("alias").setAttribute("aria-invalid", "true");
+      elemento("alias").focus();
+      return;
+    }
+
+    elemento("aliasError").textContent = "";
+    elemento("alias").setAttribute("aria-invalid", "false");
+
+    preguntas = obtenerCasos().slice();
+    if (preguntas.length === 0) {
+      elemento("aliasError").textContent = "No hay casos registrados. Carga los ejemplos en la página Crear casos.";
+      return;
+    }
+
+    for (let i = preguntas.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temporal = preguntas[i];
+      preguntas[i] = preguntas[j];
+      preguntas[j] = temporal;
+    }
+
+    posicion = 0;
+    aciertos = 0;
+    fallados = [];
+
+    elemento("inicioForm").hidden = true;
+    elemento("final").hidden = true;
+    elemento("pregunta").hidden = false;
+    mostrarPregunta();
+  });
+
+  function mostrarPregunta() {
+    let caso = preguntas[posicion];
+    elemento("progreso").textContent = "Caso " + (posicion + 1) + " de " + preguntas.length;
+    elemento("verRemitente").textContent = caso.remitente;
+    elemento("verAsunto").textContent = caso.asunto;
+    mostrarCuerpoCorreo(elemento("verCuerpo"), caso.cuerpo);
+
+    elemento("legitimo").disabled = false;
+    elemento("phishing").disabled = false;
+    elemento("respuesta").hidden = true;
+    elemento("pistas").hidden = true;
+    elemento("siguiente").hidden = true;
+
+    if (posicion === preguntas.length - 1) {
+      elemento("siguiente").textContent = "Finalizar y ver puntaje";
+    } else {
+      elemento("siguiente").textContent = "Siguiente caso";
+    }
+    elemento("legitimo").focus();
+  }
+
+  function responderCaso(eligioPhishing) {
+    let caso = preguntas[posicion];
+    let acerto = caso.phishing === eligioPhishing;
+
+    if (acerto) {
+      aciertos++;
+    } else {
+      fallados.push(caso.asunto + " (" + caso.remitente + ")");
+    }
+
+    elemento("legitimo").disabled = true;
+    elemento("phishing").disabled = true;
+
+    let estado = acerto ? "¡Respuesta correcta! " : "Respuesta incorrecta. ";
+    let tipoReal = caso.phishing ? "era un correo de PHISHING." : "era un correo LEGÍTIMO.";
+    elemento("respuesta").textContent = estado + "Este mensaje " + tipoReal;
+    elemento("respuesta").hidden = false;
+
+    let lista = elemento("listaPistas");
+    lista.innerHTML = "";
+    for (let i = 0; i < caso.pistas.length; i++) {
+      lista.appendChild(crearEtiqueta("li", caso.pistas[i]));
+    }
+
+    elemento("pistas").hidden = false;
+    elemento("siguiente").hidden = false;
+    elemento("siguiente").focus();
+  }
+
+  elemento("legitimo").addEventListener("click", function () {
+    responderCaso(false);
+  });
+
+  elemento("phishing").addEventListener("click", function () {
+    responderCaso(true);
+  });
+
+  elemento("siguiente").addEventListener("click", function () {
+    posicion++;
+    if (posicion < preguntas.length) {
+      mostrarPregunta();
+      return;
+    }
+
+    let intentos = obtenerIntentos();
+    intentos.push({
+      id: Date.now(),
+      alias: aliasActual,
+      fecha: new Date().toLocaleDateString("es-PE"),
+      aciertos: aciertos,
+      total: preguntas.length
+    });
+    guardarIntentos(intentos);
+
+    elemento("pregunta").hidden = true;
+    elemento("final").hidden = false;
+    elemento("puntaje").textContent =
+      "Participante: " + aliasActual + " | Puntaje: " + aciertos + " de " + preguntas.length +
+      " aciertos (" + porcentaje(aciertos, preguntas.length) + " %). Guardado en el historial.";
+
+    let listaErrores = elemento("erroresFinales");
+    listaErrores.innerHTML = "";
+    if (fallados.length === 0) {
+      listaErrores.appendChild(crearEtiqueta("li", "¡Ninguno! Identificaste todos los casos correctamente."));
+    } else {
+      for (let i = 0; i < fallados.length; i++) {
+        listaErrores.appendChild(crearEtiqueta("li", fallados[i]));
+      }
+    }
+  });
+
+  elemento("reiniciar").addEventListener("click", function () {
+    elemento("final").hidden = true;
+    elemento("inicioForm").hidden = false;
+    elemento("alias").focus();
+  });
+}
+
 if (elemento("casoForm")) {
   let idEditando = null;
+  let campos = ["remitente", "asunto", "cuerpo", "tipo", "pistasCampo"];
+
+  function errorCampo(id, mensaje) {
+    elemento(id + "Error").textContent = mensaje;
+    elemento(id).setAttribute("aria-invalid", mensaje !== "" ? "true" : "false");
+  }
 
   function limpiarFormulario() {
     elemento("casoForm").reset();
     idEditando = null;
+    for (let i = 0; i < campos.length; i++) {
+      errorCampo(campos[i], "");
+    }
     elemento("tituloForm").textContent = "Crear un caso simulado";
     elemento("guardar").textContent = "Guardar caso";
     elemento("cancelar").hidden = true;
@@ -48,6 +230,11 @@ if (elemento("casoForm")) {
 
   elemento("casoForm").addEventListener("submit", function (evento) {
     evento.preventDefault();
+    for (let i = 0; i < campos.length; i++) {
+      errorCampo(campos[i], "");
+    }
+    elemento("mensajeForm").textContent = "";
+
     let remitente = elemento("remitente").value.trim();
     let asunto = elemento("asunto").value.trim();
     let cuerpo = elemento("cuerpo").value.trim();
@@ -62,7 +249,35 @@ if (elemento("casoForm")) {
       }
     }
 
-    if (!remitente || !asunto || !cuerpo || !tipo || pistas.length === 0) {
+    let valido = true;
+
+    let patronCorreo = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+    if (!patronCorreo.test(remitente)) {
+      errorCampo("remitente", "Ingresa un correo con formato válido (ej. soporte@0ffice365.com).");
+      valido = false;
+    }
+
+    if (asunto.length < 3 || asunto.includes("<") || asunto.includes(">")) {
+      errorCampo("asunto", "El asunto debe tener al menos 3 caracteres y no usar símbolos < o >.");
+      valido = false;
+    }
+
+    if (cuerpo.length < 20 || cuerpo.includes("<") || cuerpo.includes(">")) {
+      errorCampo("cuerpo", "El mensaje debe tener al menos 20 caracteres y no usar símbolos < o >.");
+      valido = false;
+    }
+
+    if (tipo !== "phishing" && tipo !== "legitimo") {
+      errorCampo("tipo", "Selecciona si el caso es Phishing o Legítimo.");
+      valido = false;
+    }
+
+    if (pistas.length < 1 || pistas.length > 3) {
+      errorCampo("pistasCampo", "Debes escribir entre 1 y 3 pistas (una en cada línea).");
+      valido = false;
+    }
+
+    if (!valido) {
       return;
     }
 
