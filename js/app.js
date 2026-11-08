@@ -8,6 +8,27 @@ function crearEtiqueta(nombreEtiqueta, texto) {
   return nodo;
 }
 
+function mostrarCuerpoCorreo(contenedor, textoMensaje) {
+  contenedor.innerHTML = "";
+  let palabras = textoMensaje.split(" ");
+
+  for (let i = 0; i < palabras.length; i++) {
+    let palabra = palabras[i];
+    if (palabra.startsWith("http://") || palabra.startsWith("https://")) {
+      let enlaceVisual = crearEtiqueta("span", palabra);
+      enlaceVisual.className = "enlace-falso";
+      enlaceVisual.title = "Enlace desactivado por seguridad";
+      contenedor.appendChild(enlaceVisual);
+    } else {
+      contenedor.appendChild(document.createTextNode(palabra));
+    }
+
+    if (i < palabras.length - 1) {
+      contenedor.appendChild(document.createTextNode(" "));
+    }
+  }
+}
+
 function porcentaje(aciertos, total) {
   if (total === 0) {
     return 0;
@@ -32,6 +53,141 @@ if (elemento("menuBoton")) {
     let menu = elemento("menu");
     let abierto = menu.classList.toggle("abierto");
     elemento("menuBoton").setAttribute("aria-expanded", abierto ? "true" : "false");
+  });
+}
+
+if (elemento("inicioForm")) {
+  let aliasActual = "";
+  let preguntas = [];
+  let posicion = 0;
+  let aciertos = 0;
+  let fallados = [];
+
+  elemento("inicioForm").addEventListener("submit", function (evento) {
+    evento.preventDefault();
+    aliasActual = elemento("alias").value.trim();
+    if (!aliasActual) {
+      return;
+    }
+
+    preguntas = obtenerCasos().slice();
+    if (preguntas.length === 0) {
+      return;
+    }
+
+    for (let i = preguntas.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temporal = preguntas[i];
+      preguntas[i] = preguntas[j];
+      preguntas[j] = temporal;
+    }
+
+    posicion = 0;
+    aciertos = 0;
+    fallados = [];
+
+    elemento("inicioForm").hidden = true;
+    elemento("final").hidden = true;
+    elemento("pregunta").hidden = false;
+    mostrarPregunta();
+  });
+
+  function mostrarPregunta() {
+    let caso = preguntas[posicion];
+    elemento("progreso").textContent = "Caso " + (posicion + 1) + " de " + preguntas.length;
+    elemento("verRemitente").textContent = caso.remitente;
+    elemento("verAsunto").textContent = caso.asunto;
+    mostrarCuerpoCorreo(elemento("verCuerpo"), caso.cuerpo);
+
+    elemento("legitimo").disabled = false;
+    elemento("phishing").disabled = false;
+    elemento("respuesta").hidden = true;
+    elemento("pistas").hidden = true;
+    elemento("siguiente").hidden = true;
+
+    if (posicion === preguntas.length - 1) {
+      elemento("siguiente").textContent = "Finalizar y ver puntaje";
+    } else {
+      elemento("siguiente").textContent = "Siguiente caso";
+    }
+    elemento("legitimo").focus();
+  }
+
+  function responderCaso(eligioPhishing) {
+    let caso = preguntas[posicion];
+    let acerto = caso.phishing === eligioPhishing;
+
+    if (acerto) {
+      aciertos++;
+    } else {
+      fallados.push(caso.asunto + " (" + caso.remitente + ")");
+    }
+
+    elemento("legitimo").disabled = true;
+    elemento("phishing").disabled = true;
+
+    let estado = acerto ? "¡Respuesta correcta! " : "Respuesta incorrecta. ";
+    let tipoReal = caso.phishing ? "era un correo de PHISHING." : "era un correo LEGÍTIMO.";
+    elemento("respuesta").textContent = estado + "Este mensaje " + tipoReal;
+    elemento("respuesta").hidden = false;
+
+    let lista = elemento("listaPistas");
+    lista.innerHTML = "";
+    for (let i = 0; i < caso.pistas.length; i++) {
+      lista.appendChild(crearEtiqueta("li", caso.pistas[i]));
+    }
+
+    elemento("pistas").hidden = false;
+    elemento("siguiente").hidden = false;
+    elemento("siguiente").focus();
+  }
+
+  elemento("legitimo").addEventListener("click", function () {
+    responderCaso(false);
+  });
+
+  elemento("phishing").addEventListener("click", function () {
+    responderCaso(true);
+  });
+
+  elemento("siguiente").addEventListener("click", function () {
+    posicion++;
+    if (posicion < preguntas.length) {
+      mostrarPregunta();
+      return;
+    }
+
+    let intentos = obtenerIntentos();
+    intentos.push({
+      id: Date.now(),
+      alias: aliasActual,
+      fecha: new Date().toLocaleDateString("es-PE"),
+      aciertos: aciertos,
+      total: preguntas.length
+    });
+    guardarIntentos(intentos);
+
+    elemento("pregunta").hidden = true;
+    elemento("final").hidden = false;
+    elemento("puntaje").textContent =
+      "Participante: " + aliasActual + " | Puntaje: " + aciertos + " de " + preguntas.length +
+      " aciertos (" + porcentaje(aciertos, preguntas.length) + " %). Guardado en el historial.";
+
+    let listaErrores = elemento("erroresFinales");
+    listaErrores.innerHTML = "";
+    if (fallados.length === 0) {
+      listaErrores.appendChild(crearEtiqueta("li", "¡Ninguno! Identificaste todos los casos correctamente."));
+    } else {
+      for (let i = 0; i < fallados.length; i++) {
+        listaErrores.appendChild(crearEtiqueta("li", fallados[i]));
+      }
+    }
+  });
+
+  elemento("reiniciar").addEventListener("click", function () {
+    elemento("final").hidden = true;
+    elemento("inicioForm").hidden = false;
+    elemento("alias").focus();
   });
 }
 
