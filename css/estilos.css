@@ -193,3 +193,141 @@ select[aria-invalid="true"] {
   align-items: center;
   gap: 6px;
 }
+
+.correo {
+  padding: 16px;
+  background-color: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.remitente-destacado {
+  font-family: monospace;
+  font-size: 0.98rem;
+  background-color: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.separador-correo {
+  border: none;
+  border-top: 1px solid var(--borde);
+  margin: 10px 0;
+}
+
+.cuerpo {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.enlace-falso {
+  color: var(--enlace-correo);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.aviso {
+  padding: 12px;
+  background-color: #eff6ff;
+  border-left: 4px solid var(--principal);
+  font-weight: bold;
+}
+
+.caja-pistas {
+  background-color: #fefce8;
+  border: 1px solid #fde047;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.tarjetas-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.caja-dato {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+}
+
+.caja-dato strong {
+  display: block;
+  font-size: 1.4rem;
+  color: var(--principal);
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 580px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--borde);
+  word-break: break-word;
+}
+
+th {
+  background-color: #e2e8f0;
+  color: var(--principal);
+}
+
+footer {
+  text-align: center;
+  padding: 18px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+@media (min-width: 601px) {
+  nav {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .menu-boton {
+    display: none;
+  }
+
+  .filtros {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 961px) {
+  main {
+    padding: 24px;
+  }
+
+  .filtros {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .filtros-dos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
