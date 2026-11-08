@@ -1,3 +1,11 @@
+/* Cinco heurísticas de usabilidad de Nielsen aplicadas en el proyecto:
+1. Visibilidad del estado: indica número de caso actual, conteos y mensajes de confirmación.
+2. Relación con el mundo real: formato de bandeja de correo y botones claros ("Es Legítimo" / "Es Phishing").
+3. Control y libertad del usuario: opción para cancelar edición y confirmación antes de eliminar.
+4. Prevención de errores: validación en cada campo antes de guardar datos.
+5. Reconocimiento antes que recuerdo: muestra las pistas de detección tras cada respuesta.
+*/
+
 function elemento(id) {
   return document.getElementById(id);
 }
@@ -66,12 +74,21 @@ if (elemento("inicioForm")) {
   elemento("inicioForm").addEventListener("submit", function (evento) {
     evento.preventDefault();
     aliasActual = elemento("alias").value.trim();
-    if (!aliasActual) {
+
+    let patronAlias = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ _.-]{2,30}$/;
+    if (!patronAlias.test(aliasActual)) {
+      elemento("aliasError").textContent = "Escribe un alias válido de 2 a 30 caracteres (sin símbolos < o >).";
+      elemento("alias").setAttribute("aria-invalid", "true");
+      elemento("alias").focus();
       return;
     }
 
+    elemento("aliasError").textContent = "";
+    elemento("alias").setAttribute("aria-invalid", "false");
+
     preguntas = obtenerCasos().slice();
     if (preguntas.length === 0) {
+      elemento("aliasError").textContent = "No hay casos registrados. Carga los ejemplos en la página Crear casos.";
       return;
     }
 
@@ -193,10 +210,19 @@ if (elemento("inicioForm")) {
 
 if (elemento("casoForm")) {
   let idEditando = null;
+  let campos = ["remitente", "asunto", "cuerpo", "tipo", "pistasCampo"];
+
+  function errorCampo(id, mensaje) {
+    elemento(id + "Error").textContent = mensaje;
+    elemento(id).setAttribute("aria-invalid", mensaje !== "" ? "true" : "false");
+  }
 
   function limpiarFormulario() {
     elemento("casoForm").reset();
     idEditando = null;
+    for (let i = 0; i < campos.length; i++) {
+      errorCampo(campos[i], "");
+    }
     elemento("tituloForm").textContent = "Crear un caso simulado";
     elemento("guardar").textContent = "Guardar caso";
     elemento("cancelar").hidden = true;
@@ -204,6 +230,11 @@ if (elemento("casoForm")) {
 
   elemento("casoForm").addEventListener("submit", function (evento) {
     evento.preventDefault();
+    for (let i = 0; i < campos.length; i++) {
+      errorCampo(campos[i], "");
+    }
+    elemento("mensajeForm").textContent = "";
+
     let remitente = elemento("remitente").value.trim();
     let asunto = elemento("asunto").value.trim();
     let cuerpo = elemento("cuerpo").value.trim();
@@ -218,7 +249,35 @@ if (elemento("casoForm")) {
       }
     }
 
-    if (!remitente || !asunto || !cuerpo || !tipo || pistas.length === 0) {
+    let valido = true;
+
+    let patronCorreo = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+    if (!patronCorreo.test(remitente)) {
+      errorCampo("remitente", "Ingresa un correo con formato válido (ej. soporte@0ffice365.com).");
+      valido = false;
+    }
+
+    if (asunto.length < 3 || asunto.includes("<") || asunto.includes(">")) {
+      errorCampo("asunto", "El asunto debe tener al menos 3 caracteres y no usar símbolos < o >.");
+      valido = false;
+    }
+
+    if (cuerpo.length < 20 || cuerpo.includes("<") || cuerpo.includes(">")) {
+      errorCampo("cuerpo", "El mensaje debe tener al menos 20 caracteres y no usar símbolos < o >.");
+      valido = false;
+    }
+
+    if (tipo !== "phishing" && tipo !== "legitimo") {
+      errorCampo("tipo", "Selecciona si el caso es Phishing o Legítimo.");
+      valido = false;
+    }
+
+    if (pistas.length < 1 || pistas.length > 3) {
+      errorCampo("pistasCampo", "Debes escribir entre 1 y 3 pistas (una en cada línea).");
+      valido = false;
+    }
+
+    if (!valido) {
       return;
     }
 
