@@ -20,6 +20,9 @@ Respuestas a las preguntas de la guía
 Aplicación en nuestro proyecto
 Implementamos la función `errorCampo(id, mensaje)` en `js/app.js`, que escribe el texto de ayuda en el elemento `<small class="error">` vinculado por `aria-describedby` y activa `aria-invalid="true"`, resaltando el borde y enfocando los controles con `:focus-visible`.
 
+Dudas surgidas en el estudio
+- ¿Cuándo es necesario agregar el atributo aria-live="polite" junto con aria-invalid para que un lector de pantalla lea en voz alta el error apenas aparece?
+
 Referencias (APA 7)
 - Nielsen, J. (1994). Enhancing the explanatory power of usability heuristics. En Proceedings of the SIGCHI Conference on Human Factors in Computing Systems (CHI '94) (pp. 152-158). ACM.
 - Nielsen Norman Group. (s. f.). 10 usability heuristics for user interface design. https://www.nngroup.com/articles/ten-usability-heuristics/

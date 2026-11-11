@@ -16,6 +16,9 @@ El diseño web adaptable bajo el enfoque mobile-first consiste en construir prim
 Aplicación en nuestro proyecto
 Definimos colores institucionales en `:root` (`--principal: #16325c`), aplicamos `box-sizing: border-box` globalmente, usamos Flexbox en `.cabecera` y `nav`, y empleamos Grid en `.filtros` pasando de 1 columna en móvil a 2 en tableta (601 px) y 4 en escritorio (961 px).
 
+Dudas surgidas en el estudio
+- ¿En qué casos conviene combinar media queries con funciones como clamp() o unidades rem para que el tamaño de letra se adapte solo sin declarar tantas reglas por pantalla?
+
 Referencias (APA 7)
 - Mozilla. (s. f.). Diseño web adaptable y Media Queries. MDN Web Docs. https://developer.mozilla.org/es/docs/Learn/CSS/CSS_layout/Responsive_Design
 - W3C. (2023). Web Content Accessibility Guidelines (WCAG) 2.2. https://www.w3.org/TR/WCAG22/

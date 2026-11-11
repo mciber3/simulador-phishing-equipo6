@@ -14,6 +14,9 @@ Respuestas a las preguntas guía
 Aplicación en nuestro proyecto
 En `js/datos.js` encapsulamos la lectura y escritura en `localStorage` bajo las claves `equipo6_casos` y `equipo6_intentos`. En `js/app.js` creamos la función `crearEtiqueta(etiqueta, texto)` que usa `document.createElement` y `textContent` para poblar las tablas de casos y de historial sin riesgo de XSS.
 
+Dudas surgidas en el estudio
+- ¿Cómo debemos manejar en el código el error cuando localStorage llena sus 5 MB de límite en el navegador del usuario?
+
 Referencias (APA 7)
 - Haverbeke, M. (2024). *Eloquent JavaScript* (4.ª ed.). No Starch Press. https://eloquentjavascript.net/
 - Mozilla. (s. f.). *Web Storage API y Document Object Model (DOM)*. MDN Web Docs. https://developer.mozilla.org/es/docs/Web/API/Web_Storage_API
