@@ -53,4 +53,6 @@ Proyecto web desarrollado en HTML5, CSS3 y JavaScript puro (sin librerías exter
 
 ## Documentación adjunta
 - **Fichas de investigación (S11 a S15):** [`docs/investigacion/`](docs/investigacion/)
-- **Reporte de pruebas y controles de seguridad:** [`docs/pruebas-y-seguridad.md`](docs/pruebas-y-seguridad.md)
+- **Reporte de pruebas y controles de seguridad:** [`docs/investigacion/pruebas-y-seguridad.md`](docs/investigacion/pruebas-y-seguridad.md)
+- **Informe Final del Proyecto (PDF):** [`docs/investigacion/informe-final-equipo6.pdf`](docs/investigacion/informe-final-equipo6.pdf)
+- **Declaración Firmada de Autoría y Herramientas (PDF):** [`docs/investigacion/declaracion-autoria-equipo6.pdf`](docs/investigacion/declaracion-autoria-equipo6.pdf)
